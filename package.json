@@ -66,6 +66,7 @@
         "statements": 95
       }
     },
+    "collectCoverage": true,
     "collectCoverageFrom": [
       "src/*.{js,ts}"
     ]
