@@ -1,4 +1,4 @@
-import { onUpdate, requestUpdate } from '../src/updateable'
+import { onUpdate, requestUpdate } from '../src/fam-element'
 
 describe('onUpdate', () => {
   it('asynchronously calls the updateCallback when an update is requested', async () => {
