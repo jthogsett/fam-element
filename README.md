@@ -25,7 +25,7 @@ class Foo {
   }
 
   @observeProperty((instance, oldValue, newValue) =>
-    console.log(`${instance.id}'s message updated from ${oldValue} to ${newValue}`)
+    console.log(`${instance.id}'s message set from ${oldValue} to ${newValue}`)
   )
   message?: string
 }
@@ -33,7 +33,7 @@ class Foo {
 const bar = new Foo('bar')
 bar.message = 'Hello!'
 
-// console: bar's message updated from undefined to Hello!
+// console: bar's message set from undefined to Hello!
 ```
 
 ### Prefer JS?
@@ -83,4 +83,62 @@ onUpdate(() => {
   /* do work */
 })(MyUpdateableClass)
 const myUpdateableObject = new MyUpdateableClass()
+```
+
+## Detect Property Changes In Batch
+
+Register change callbacks to properties of a class. If any watched property is changed, all changed property callbacks will be called in the next tick.
+
+This is similar to observeProperty, except the callback will be executed in the next tick and will only fire if the property actually changes instead of just being set.
+
+### Usage
+
+```ts
+import { onPropertyChange } from 'fam-element'
+
+class Foo {
+  @onPropertyChange((instance, { oldValue, newValue }) =>
+    console.log(`bar changed from ${oldValue} to ${newValue}`)
+  )
+  bar?: string
+}
+
+const myFoo = new Foo()
+myFoo.bar = 'baz'
+
+// next tick - console: bar changed from undefined to baz!
+```
+
+By default, a change is detected by checking exact equality. This can be configured by registering a custom change detector for the property
+
+```ts
+import { onPropertyChange, changeDetector } from 'fam-element'
+
+@onUpdate(instance => console.log(`Hello ${instance.message}`!))
+class Foo {
+  @changeDetector((oldValue, newValue) => oldValue.toUpperCase() !== newValue.toUpperCase())
+  @onPropertyChange((instance, { oldValue, newValue }) => {
+    /* this will only be called if bar changes without considering case sensitivity */
+  })
+  bar: string = 'baz'
+}
+```
+
+### Prefer JS?
+
+onPropertyChange will always return a property descriptor, so if you don't want to use typescript, you can use the return value to define properties
+
+```js
+class Foo {}
+Object.defineProperty(
+  Foo.prototype,
+  'message',
+  onPropertyChange(() => console.log('message updated'))(Foo.prototype, 'message')
+)
+```
+
+changeDetector modifies metadata on the class, so all you need to do is pass the target and property key into the decorator. This will always be void so don't assign it through Object.defineProperty
+
+```js
+changeDetector((oldValue, newValue) => oldValue != newValue)(Foo.prototype, 'message')
 ```
