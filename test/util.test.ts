@@ -1,4 +1,10 @@
-import { getPropertyDescriptor, memoize, initializeOwnProperty, memoizeMap } from '../src/util'
+import {
+  getPropertyDescriptor,
+  memoize,
+  initializeOwnProperty,
+  memoizeMap,
+  oncePerHierarchy
+} from '../src/util'
 
 describe('getPropertyDescriptor', () => {
   it("gets an object's property descriptor", () => {
@@ -77,5 +83,24 @@ describe('memoizeMap', () => {
     memoizeMap(foo, 'bar')
     expect(foo.bar).toStrictEqual(new Map<string, number>([['a', 1], ['b', 2]]))
     expect(foo.bar).not.toBe(fooSuper.bar)
+  })
+})
+
+describe('oncePerHierarchy', () => {
+  it("runs an operation against an object if that operation has not yet been performed against that object's prototype hierarchy", () => {
+    interface Foo {
+      bar: string
+    }
+    const operation = jest.fn<Foo, [Foo]>(foo => foo)
+    const fallback = jest.fn<void, [Foo]>(foo => {})
+
+    const runOncePerHierarchy = oncePerHierarchy(operation, fallback)
+    const foo: Foo = { bar: 'baz ' }
+    runOncePerHierarchy(foo)
+    runOncePerHierarchy(foo)
+    const fooExtension = Object.create(foo) as Foo
+    runOncePerHierarchy(fooExtension)
+    expect(operation).toBeCalledTimes(1)
+    expect(fallback).toBeCalledTimes(2)
   })
 })
