@@ -37,7 +37,9 @@ export function changeDetector<Value>(
   }
 }
 
-const makeChangeable = oncePerHierarchy(onUpdate(emitPropertyChanges))
+const makeChangeable: <TargetConstructor extends Constructor<Changeable>>(
+  targetClass: TargetConstructor
+) => void = oncePerHierarchy(onUpdate(emitPropertyChanges))
 
 export function emitPropertyChanges(target: Changeable) {
   const updatingProperties = target[UPDATING_PROPERTIES]!
