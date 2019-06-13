@@ -18,32 +18,27 @@ export function getPropertyDescriptor<Target, Property extends keyof Target>(
 }
 
 export function memoizeMap<Key, Value, Property extends PropertyKey>(
-  target: Partial<Record<Property, Map<Key, Value>>>,
+  target: { [P in Property]?: Map<Key, Value> },
   property: Property
 ) {
-  memoize<Record<Property, Map<Key, Value>>, Property>(
-    target,
-    property,
-    () => new Map<Key, Value>(),
-    parentMap => new Map(parentMap!.entries())
-  )
+  memoize(target, property, () => new Map<Key, Value>(), parentMap => new Map(parentMap.entries()))
 }
 
-export function memoize<Target extends {}, Property extends keyof Target>(
-  target: Partial<Target>,
+export function memoize<Property extends PropertyKey, Value>(
+  target: { [P in Property]?: Value },
   property: Property,
-  initialize: () => Target[Property],
-  cloneFromSuper: (superValue: Target[Property]) => Target[Property]
+  initialize: () => Value,
+  cloneFromSuper: (superValue: Value) => Value
 ) {
   initializeOwnProperty(target, property, () =>
-    property in target ? cloneFromSuper(target[property] as Target[Property]) : initialize()
+    property in target ? cloneFromSuper(target[property]!) : initialize()
   )
 }
 
-export function initializeOwnProperty<Target extends {}, Property extends keyof Target>(
-  target: Partial<Target>,
+export function initializeOwnProperty<Property extends PropertyKey, Value>(
+  target: { [P in Property]?: Value },
   property: Property,
-  initialize: () => Target[Property]
+  initialize: () => Value
 ) {
   if (!target.hasOwnProperty(property)) {
     target[property] = initialize()

@@ -79,7 +79,10 @@ export function registerPropertyChangeCallback(
   property: PropertyKey,
   propertyChangeCallback: PropertyChangeCallback
 ) {
-  memoizeMap(target, PROPERTY_CHANGE_CALLBACKS)
+  memoizeMap(
+    target as { [PROPERTY_CHANGE_CALLBACKS]?: Map<PropertyKey, PropertyChangeCallback> },
+    PROPERTY_CHANGE_CALLBACKS
+  )
   const propertyChangeCallbacks = target[PROPERTY_CHANGE_CALLBACKS]!
   const superChangeCallback = propertyChangeCallbacks.get(property)
   if (superChangeCallback) {
