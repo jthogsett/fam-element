@@ -142,3 +142,49 @@ changeDetector modifies metadata on the class, so all you need to do is pass the
 ```js
 changeDetector((oldValue, newValue) => oldValue != newValue)(Foo.prototype, 'message')
 ```
+
+## Update Pipelines
+
+Register an update callback to a subset of properties on a class. This will wait for all registered properties to updatebefore calling the callback in the next tick.
+
+This allows you to perform specific operations against the instance of a class when those operations are dependent on certain properties.
+
+### Usage
+
+```ts
+import { updatePipeline } from 'fam-element'
+
+const myPipeline = updatePipeline((fooInstance, pipelinePropertyChangeStates) =>
+  console.log(`Hello ${fooInstance.name}!`)
+)
+
+class Foo {
+  @myPipeline.registerProperty
+  name: string
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
+const myFoo = new Foo('World')
+
+// next tick - console: Hello World!
+```
+
+It's also possible to manually trigger a pipeline to run regardless of a property updating
+
+```ts
+myPipeline.requestUpdate(myFoo)
+
+// next tick - console: Hello World!
+```
+
+### Prefer JS?
+
+registerProperty will always return a property descriptor, so if you don't want to use typescript, you can use the return value to define properties
+
+```js
+class Foo {}
+Object.defineProperty(Foo.prototype, 'name', myPipeline.registerProperty(Foo.prototype, 'name'))
+```
