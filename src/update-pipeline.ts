@@ -10,7 +10,9 @@ export function updatePipeline<Target>(
     [UPDATING_PROPERTIES]?: Map<PropertyKey, PropertyChangeState>
   }
 
-  const registerPipeline = oncePerHierarchy(
+  const registerPipeline: <TargetConstructor extends Constructor<PipelineTarget>>(
+    targetClass: TargetConstructor
+  ) => void = oncePerHierarchy(
     onUpdate<PipelineTarget>(target => {
       const updatingProperties = target[UPDATING_PROPERTIES]
       if (updatingProperties) {
