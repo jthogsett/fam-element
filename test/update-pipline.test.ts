@@ -47,6 +47,27 @@ describe('updatePipeline', () => {
 
     expect(myPipelineAction).not.toBeCalled()
   })
+
+  it('will return the same descriptor if called multiple times', () => {
+    class FooImp implements Foo {
+      bar?: string
+    }
+
+    const descriptor1 = myPipeline.registerProperty(
+      FooImp.prototype,
+      'bar',
+      Object.getOwnPropertyDescriptor(FooImp.prototype, 'bar')!
+    ) as PropertyDescriptor
+    Object.defineProperty(FooImp.prototype, 'bar', descriptor1)
+    const descriptor2 = myPipeline.registerProperty(
+      FooImp.prototype,
+      'bar',
+      Object.getOwnPropertyDescriptor(FooImp.prototype, 'bar')!
+    ) as PropertyDescriptor
+
+    expect(descriptor1.get).toBe(descriptor2.get)
+    expect(descriptor1.set).toBe(descriptor2.set)
+  })
   describe('requestUpdate', () => {
     it('will call the pipeline action regardless of if a pipline property was changed', async () => {
       class FooImp implements Foo {
