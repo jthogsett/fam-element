@@ -90,3 +90,40 @@ export function oncePerHierarchy<
     return fallback(...args)
   }
 }
+
+export function oncePerKeyPerHierarchy<
+  Target extends {},
+  Key,
+  Args extends [Target, Key, ...any[]],
+  Return,
+  Fallback
+>(
+  operation: (...args: Args) => Return,
+  fallback: (...args: Args) => Fallback
+): (...args: Args) => Return | Fallback
+export function oncePerKeyPerHierarchy<
+  Target extends {},
+  Key,
+  Args extends [Target, Key, ...any[]],
+  Return
+>(operation: (...args: Args) => Return): (...args: Args) => Return | void
+export function oncePerKeyPerHierarchy<
+  Target extends {},
+  Key,
+  Args extends [Target, Key, ...any[]],
+  Return,
+  Fallback = void
+>(
+  operation: (...args: Args) => Return,
+  fallback?: (...args: Args) => Fallback
+): (...args: Args) => Return | Fallback {
+  const keyOperations = new Map<Key, (...args: Args) => Return | Fallback>()
+  return (...args: Args) => {
+    let keyOperation = keyOperations.get(args[1])
+    if (!keyOperation) {
+      keyOperation = oncePerHierarchy(operation, fallback!)
+      keyOperations.set(args[1], keyOperation)
+    }
+    return keyOperation(...args)
+  }
+}

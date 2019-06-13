@@ -3,7 +3,8 @@ import {
   memoize,
   initializeOwnProperty,
   memoizeMap,
-  oncePerHierarchy
+  oncePerHierarchy,
+  oncePerKeyPerHierarchy
 } from '../src/util'
 
 describe('getPropertyDescriptor', () => {
@@ -102,5 +103,21 @@ describe('oncePerHierarchy', () => {
     runOncePerHierarchy(fooExtension)
     expect(operation).toBeCalledTimes(1)
     expect(fallback).toBeCalledTimes(2)
+  })
+})
+
+describe('oncePerKeyPerHierarchy', () => {
+  it("runs an operation against an object if it hasn't been ran for a specific key", () => {
+    interface Foo {}
+    const operation = jest.fn<void, [Foo, any]>()
+    const oncePerKeyOperation = oncePerKeyPerHierarchy(operation)
+    const foo: Foo = {}
+    oncePerKeyOperation(foo, 'bar')
+    expect(operation).toBeCalledWith(foo, 'bar')
+    operation.mockClear()
+    oncePerKeyOperation(foo, 'bar')
+    expect(operation).not.toBeCalled()
+    oncePerKeyOperation(foo, 'baz')
+    expect(operation).toBeCalledWith(foo, 'baz')
   })
 })
