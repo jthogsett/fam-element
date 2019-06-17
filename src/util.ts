@@ -122,3 +122,22 @@ export function oncePerKeyPerHierarchy<
     return keyOperation(...args)
   }
 }
+
+export function overrideSuper<
+  Property extends PropertyKey,
+  Method extends (...args: any[]) => void
+>(target: { [P in Property]?: Method }, key: Property, action: Method) {
+  target[key] = inheritSuper(action, target[key])
+}
+
+export function inheritSuper<Action extends (...args: any[]) => void>(
+  action: Action,
+  superAction: Action | undefined
+) {
+  return superAction
+    ? (function(this: unknown, ...args: Parameters<Action>) {
+        superAction.apply(this, args)
+        action.apply(this, args)
+      } as Action)
+    : action
+}

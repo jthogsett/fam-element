@@ -1,4 +1,4 @@
-import { memoizeMap, oncePerHierarchy } from './util'
+import { memoizeMap, oncePerHierarchy, inheritSuper } from './util'
 import { observeProperty } from './observe-property'
 import { onUpdate, requestUpdate } from './updateable'
 
@@ -84,18 +84,10 @@ export function registerPropertyChangeCallback(
     PROPERTY_CHANGE_CALLBACKS
   )
   const propertyChangeCallbacks = target[PROPERTY_CHANGE_CALLBACKS]!
-  const superChangeCallback = propertyChangeCallbacks.get(property)
-  if (superChangeCallback) {
-    propertyChangeCallbacks.set(
-      property,
-      (target: unknown, propertyChangeState: PropertyChangeState) => {
-        superChangeCallback(target, propertyChangeState)
-        propertyChangeCallback(target, propertyChangeState)
-      }
-    )
-  } else {
-    propertyChangeCallbacks.set(property, propertyChangeCallback)
-  }
+  propertyChangeCallbacks.set(
+    property,
+    inheritSuper(propertyChangeCallback, propertyChangeCallbacks.get(property))
+  )
 }
 
 export function requestPropertyUpdate(

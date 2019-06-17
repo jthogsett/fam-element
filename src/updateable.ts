@@ -1,3 +1,5 @@
+import { overrideSuper } from './util'
+
 const UPDATE = Symbol('update')
 const UPDATE_TASK = Symbol('updateTask')
 
@@ -12,17 +14,9 @@ export function onUpdate<Target>(
   return <TargetConstructor extends Constructor<Target & Partial<Updateable>>>(
     targetClass: TargetConstructor
   ) => {
-    const superUpdate = targetClass.prototype[UPDATE]
-    if (superUpdate) {
-      targetClass.prototype[UPDATE] = function() {
-        superUpdate.call(this)
-        updateCallback(this)
-      }
-    } else {
-      targetClass.prototype[UPDATE] = function() {
-        updateCallback(this)
-      }
-    }
+    overrideSuper(targetClass.prototype, UPDATE, function(this: Target) {
+      updateCallback(this)
+    })
   }
 }
 

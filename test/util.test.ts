@@ -4,7 +4,9 @@ import {
   initializeOwnProperty,
   memoizeMap,
   oncePerHierarchy,
-  oncePerKeyPerHierarchy
+  oncePerKeyPerHierarchy,
+  overrideSuper,
+  inheritSuper
 } from '../src/util'
 
 describe('getPropertyDescriptor', () => {
@@ -119,5 +121,41 @@ describe('oncePerKeyPerHierarchy', () => {
     expect(operation).not.toBeCalled()
     oncePerKeyOperation(foo, 'baz')
     expect(operation).toBeCalledWith(foo, 'baz')
+  })
+})
+
+describe('overrideSuper', () => {
+  it('overrides and inherits a method', () => {
+    const method1: any = jest.fn()
+    const method2: any = jest.fn()
+
+    const foo = { bar: method1 }
+    overrideSuper(foo, 'bar', method2)
+
+    foo.bar()
+
+    expect(method1).toBeCalled()
+    expect(method2).toBeCalled()
+  })
+})
+
+describe('inheritSuper', () => {
+  it('returns the base action if the super is undefined', () => {
+    const action = jest.fn()
+    const joinedAction = inheritSuper(action, undefined)
+    expect(joinedAction).toBe(action)
+  })
+  it('inherits from a known action', () => {
+    const callOrder: any[] = []
+    const base: any = jest.fn(() => callOrder.push('1'))
+    const inheriter: any = jest.fn(() => callOrder.push('2'))
+
+    const action = inheritSuper(inheriter, base)
+
+    action()
+
+    expect(base).toBeCalledTimes(1)
+    expect(inheriter).toBeCalledTimes(1)
+    expect(callOrder).toStrictEqual(['1', '2'])
   })
 })
