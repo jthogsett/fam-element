@@ -188,3 +188,44 @@ registerProperty will always return a property descriptor, so if you don't want 
 class Foo {}
 Object.defineProperty(Foo.prototype, 'name', myPipeline.registerProperty(Foo.prototype, 'name'))
 ```
+
+## Observe Attributes
+
+Observe HTMLElement attributes with decorators
+
+### Usage
+
+```ts
+import { observeAttribute } from 'fam-element'
+
+@observeAttribute('my-attribute', (instance, oldValue, newValue) =>
+  console.log(`my-attribute changed from ${oldValue} to ${newValue}`)
+)
+class MyCustomElement extends HTMLElement {}
+```
+
+is identical to
+
+```js
+class MyCustomElement extends HTMLElement {
+  static get observedAttributes() {
+    return ['my-attribute']
+  }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === 'my-attribute') {
+      console.log(`my-attribute changed from ${oldValue} to ${newValue}`)
+    }
+  }
+}
+```
+
+### Prefer JS?
+
+observeAttribute will mutate the existing class instead of wrap it, so it can be called after the class is declared
+
+```js
+class MyCustomElement extends HTMLElement {}
+observeAttribute('my-attribute', (instance, oldValue, newValue) =>
+  console.log(`my-attribute changed from ${oldValue} to ${newValue}`)
+)(MyCustomElement)
+```
