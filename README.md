@@ -2,11 +2,12 @@
 
 The power of lit-html with the familiarity of native Web Components
 
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![npm](https://img.shields.io/npm/v/fam-element.svg)](https://www.npmjs.com/package/fam-element)
 [![Travis](https://travis-ci.org/jthogsett/fam-element.svg)](https://travis-ci.org/jthogsett/fam-element)
 [![Coverage Status](https://coveralls.io/repos/github/jthogsett/fam-element/badge.svg)](https://coveralls.io/github/jthogsett/fam-element)
 [![dependencies Status](https://david-dm.org/jthogsett/fam-element/status.svg)](https://david-dm.org/jthogsett/fam-element)
 [![devDependencies Status](https://david-dm.org/jthogsett/fam-element/dev-status.svg)](https://david-dm.org/jthogsett/fam-element?type=dev) [![Greenkeeper badge](https://badges.greenkeeper.io/jthogsett/fam-element.svg)](https://greenkeeper.io/)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Observe Properties
 
