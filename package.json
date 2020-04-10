@@ -94,7 +94,7 @@
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^3.0.0",
     "document-register-element": "^1.13.2",
-    "husky": "^3.0.0",
+    "husky": "^4.2.5",
     "jest": "^24.8.0",
     "jest-config": "^24.8.0",
     "jest-environment-jsdom-fourteen": "^0.1.0",
